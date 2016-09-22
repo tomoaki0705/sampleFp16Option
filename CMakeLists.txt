@@ -4,9 +4,6 @@ project(sampleF16c)
 
 add_executable(withoutF16c main.cpp)
 
-if (UNIX)
-    set(CMAKE_CXX_FLAGS "-mf16c")
-endif()
+set_source_files_properties(f16.cpp PROPERTIES COMPILE_FLAGS "-mf16c" )
 
-add_executable(withF16c main.cpp)
-
+add_executable(withF16c f16.cpp)
