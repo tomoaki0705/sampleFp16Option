@@ -5,26 +5,30 @@ bool checkFp16Support()
 {
   int cpuid_data[4] = { 0, 0, 0, 0 };
 
-  #ifdef __x86_64__
-  asm __volatile__
-  (
-   "movl $1, %%eax\n\t"
-   "cpuid\n\t"
-   :[eax]"=a"(cpuid_data[0]),[ebx]"=b"(cpuid_data[1]),[ecx]"=c"(cpuid_data[2]),[edx]"=d"(cpuid_data[3])
-   :
-   : "cc"
-  );
-  #else
-  asm volatile
-  (
-   "pushl %%ebx\n\t"
-   "movl $1,%%eax\n\t"
-   "cpuid\n\t"
-   "popl %%ebx\n\t"
-   : "=a"(cpuid_data[0]), "=c"(cpuid_data[2]), "=d"(cpuid_data[3])
-   :
-   : "cc"
-  );
+  #if defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
+    __cpuid(cpuid_data, 1);
+  #elif defined __GNUC__ && (defined __i386__ || defined __x86_64__)
+    #ifdef __x86_64__
+    asm __volatile__
+    (
+     "movl $1, %%eax\n\t"
+     "cpuid\n\t"
+     :[eax]"=a"(cpuid_data[0]),[ebx]"=b"(cpuid_data[1]),[ecx]"=c"(cpuid_data[2]),[edx]"=d"(cpuid_data[3])
+     :
+     : "cc"
+    );
+    #else
+    asm volatile
+    (
+     "pushl %%ebx\n\t"
+     "movl $1,%%eax\n\t"
+     "cpuid\n\t"
+     "popl %%ebx\n\t"
+     : "=a"(cpuid_data[0]), "=c"(cpuid_data[2]), "=d"(cpuid_data[3])
+     :
+     : "cc"
+    );
+    #endif
   #endif
 
   return ((cpuid_data[2] & (1<<29)) != 0);
