@@ -64,6 +64,12 @@ int test()
 int main()
 {
   std::cout << "Hello World!" << std::endl;
+#if defined __F16C__ || (defined _MSC_VER && _MSC_VER >= 1700)
+  std::cout << "F16C is enabled" << std::endl;
+#endif
+#if __AVX__
+  std::cout << "AVX is enabled" << std::endl;
+#endif
   printf("%d\n", test());
   return 0;
 }
